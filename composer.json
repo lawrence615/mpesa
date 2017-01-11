@@ -1,0 +1,28 @@
+{
+  "name": "lawrence615/mpesa",
+  "description": "Package to integrate MPesa Services i.e. C2B, B2C, B2B and Online Checkout in your Laravel app. It allows you to receive and process soap sent by Safaricom. The package is still under heavy development and thus subject to bugs and changes.",
+  "type": "library",
+  "require": {
+    "php": "^5.6 || ^7.0",
+    "nesbot/carbon": "^1.21"
+  },
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/lawrence615/mpesa"
+    }
+  ]
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Lawrence Macharia",
+      "email": "macharia@devs.mobi"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Mobidev\\Mpesa\\": "src/"
+    }
+  },
+  "minimum-stability": "dev"
+}
