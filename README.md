@@ -16,3 +16,30 @@ It allows you to receive and process soap sent by Safaricom. The package is stil
 `$ php artisan vendor:publish`
 
 Then run php artisan:migrate to create the tables in you database
+
+
+## Events
+There are events triggered when certain actions happen. You can extend the package's behaviour by setting up your own event listeners to provide custom functionality.
+
+These are the events triggered by the package. The list will grow with time as more events come up;
+
+| Event                | Available data          |
+|----------------------|-------------------------|
+|c2b.received.payment  | Full C2B Payment Object
+
+
+__C2B Payment Event Listener__
+
+Create a Controller i.e. PaymentsController then create a function c2bPayment
+```php
+    //$payload will have the data from the event
+    public function c2bPayment($payload){
+       
+    }
+```
+
+Register an event listener  in the boot method of your  EventServiceProvider:
+```php
+Event::listen('c2b.received.payment', 'App\Http\Controllers\PaymentsController@c2bPayment');
+```
+
