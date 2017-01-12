@@ -28,6 +28,7 @@ class C2BController extends BaseController
     public function receiver(Request $request)
     {
 
+        // Receive the Soap IPN from Safaricom
         $input = $request->getContent(); //getting the file input
 
         // check if $input is empty
@@ -35,11 +36,13 @@ class C2BController extends BaseController
             return;
         }
 
-
+        // package the data in an array with the type value for logging in mpesa_payment_logs_table table
         $data = ['content' => $input, 'type' => 'c2b'];
+
+        // save
         MpesaPaymentLog::create($data);
 
-
+        // initialize the DOMDocument  and create an object that we use to call loadXML and parse the XML
         $xml = new \DOMDocument();
         $xml->loadXML($input);// for c2b
 
@@ -54,7 +57,7 @@ class C2BController extends BaseController
         $data['amount'] = $xml->getElementsByTagName('TransAmount')->item(0)->nodeValue;
         $data['acc_no'] = preg_replace('/\s+/', '', $xml->getElementsByTagName('BillRefNumber')->item(0)->nodeValue);
         $data['transaction_time'] = $xml->getElementsByTagName('TransTime')->item(0)->nodeValue;
-        $data['transaction_type'] = 1;
+        $data['transaction_type'] = 1; // 1 indicates that this is an incoming/received transaction
 
         /**
          * save this in the payments table, but we first check if it exists (Safaricom sometimes send the notification twice)
