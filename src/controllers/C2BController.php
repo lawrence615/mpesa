@@ -30,6 +30,7 @@ class C2BController extends BaseController
 
         $input = $request->getContent(); //getting the file input
 
+        // check if $input is empty
         if (empty($input)) {
             return;
         }
