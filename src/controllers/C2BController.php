@@ -30,6 +30,10 @@ class C2BController extends BaseController
 
         $input = $request->getContent(); //getting the file input
 
+        if (empty($input)) {
+            return;
+        }
+
 
         $data = ['content' => $input, 'type' => 'c2b'];
         MpesaPaymentLog::create($data);
