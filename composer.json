@@ -18,5 +18,5 @@
       "Mobidev\\Mpesa\\": "src/"
     }
   },
-  "minimum-stability": "dev"
+  "minimum-stability": "alpha"
 }
