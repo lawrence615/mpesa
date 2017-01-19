@@ -1,4 +1,10 @@
 # Mpesa API Implementation
+
+[![Latest Stable Version](https://poser.pugx.org/lawrence615/mpesa/v/stable)](https://packagist.org/packages/lawrence615/mpesa)
+[![Total Downloads](https://poser.pugx.org/lawrence615/mpesa/downloads)](https://packagist.org/packages/lawrence615/mpesa)
+[![Latest Unstable Version](https://poser.pugx.org/lawrence615/mpesa/v/unstable)](https://packagist.org/packages/lawrence615/mpesa)
+[![License](https://poser.pugx.org/lawrence615/mpesa/license)](https://packagist.org/packages/lawrence615/mpesa)
+
 This package is created to integrate MPesa Services i.e. C2B, B2C, B2B and Online Checkout in your Laravel app.
 It allows you to receive and process soap sent by Safaricom. The package is still under heavy development and thus subject to bugs and changes.
 
