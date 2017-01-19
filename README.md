@@ -25,7 +25,7 @@ Then run php artisan:migrate to create the tables in you database
 
 
 ## Receiver Route
-The route that receives the IPN is `c2b/payments/receiver` i.e. http://example.com/c2b/payments/receiver. 
+The route that receives the IPN is `c2b/payments/receiver` i.e. http://example.com/c2b/payments/receiver. This is the endpoint you give to Safaricom.
 
 ## Events
 There are events triggered when certain actions happen. You can extend the package's behaviour by setting up your own event listeners to provide custom functionality.
