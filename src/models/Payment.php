@@ -17,6 +17,7 @@ class Payment extends Model
         'transaction_id',
         'amount',
         'status',
+        'business_number',
         'acc_no',
         'transaction_type',
         'transaction_time',
