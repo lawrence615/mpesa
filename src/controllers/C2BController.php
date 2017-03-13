@@ -58,6 +58,7 @@ class C2BController extends BaseController
         }
         $data['transaction_id'] = $xml->getElementsByTagName('TransID')->item(0)->nodeValue;
         $data['amount'] = $xml->getElementsByTagName('TransAmount')->item(0)->nodeValue;
+        $data['business_number'] = $xml->getElementsByTagName('BusinessShortCode')->item(0)->nodeValue;
         $data['acc_no'] = preg_replace('/\s+/', '', $xml->getElementsByTagName('BillRefNumber')->item(0)->nodeValue);
         $data['transaction_time'] = $xml->getElementsByTagName('TransTime')->item(0)->nodeValue;
         $data['transaction_type'] = $xml->getElementsByTagName('TransType')->item(0)->nodeValue; // The type of the transaction eg. Paybill, Buygoods etc,
