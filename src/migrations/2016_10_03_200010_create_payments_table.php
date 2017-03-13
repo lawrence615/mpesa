@@ -16,13 +16,14 @@ class CreatePaymentsTable extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->increments('id');
             $table->string('phone_no', 20);
-            $table->string('client_name', 120);
+            $table->string('client_first_name', 40)->nullable();
+            $table->string('client_middle_name', 40)->nullable();
+            $table->string('client_last_name', 40)->nullable();
             $table->string('transaction_id', 50);
             $table->float('amount')->nullable();
             $table->string('acc_no')->nullable();
-            $table->smallInteger('status')->default(0);
             $table->integer('transaction_type')->nullable();
-            $table->string('transaction_time', 20);
+            $table->string('transaction_time', 20)->nullable();
             $table->timestamps();
         });
     }
