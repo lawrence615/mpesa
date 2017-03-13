@@ -13,13 +13,19 @@ It allows you to receive and process soap sent by Safaricom. The package is stil
 - [Laravel 5.x](https://github.com/laravel/framework)
 
 ## Quick Installation
-`composer require "lawrence615/mpesa:dev-master"`
+```bash
+composer require "lawrence615/mpesa:dev-master"
+```
 
 #### Service Provider
-`Mobidev\Mpesa\MpesaServiceProvider::class`
+```php
+Mobidev\Mpesa\MpesaServiceProvider::class
+```
 
 #### Configuration and Assets
-`$ php artisan vendor:publish`
+```bash
+php artisan vendor:publish --provider="Mobidev\Mpesa\MpesaServiceProvider"
+```
 
 Then run php artisan migrate to create the tables in you database. This will create two tables;
 
