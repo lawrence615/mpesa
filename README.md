@@ -21,7 +21,7 @@ It allows you to receive and process soap sent by Safaricom. The package is stil
 #### Configuration and Assets
 `$ php artisan vendor:publish`
 
-Then run php artisan:migrate to create the tables in you database. This will create two tables;
+Then run php artisan migrate to create the tables in you database. This will create two tables;
 
 1. mpesa_payment_logs table - logs everything received from Safaricom
 
