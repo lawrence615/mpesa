@@ -21,6 +21,7 @@ class CreatePaymentsTable extends Migration
             $table->string('sender_last_name', 40)->nullable();
             $table->string('transaction_id', 50);
             $table->float('amount')->nullable();
+            $table->string('business_number', 100)->nullable();
             $table->string('acc_no', 100)->nullable();
             $table->string('transaction_type', 20)->nullable();
             $table->string('transaction_time', 20)->nullable();
