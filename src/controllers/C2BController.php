@@ -49,15 +49,18 @@ class C2BController extends BaseController
 
         $data['phone_no'] = "+254" . substr(trim($xml->getElementsByTagName('MSISDN')->item(0)->nodeValue), -9);
         if ($xml->getElementsByTagName('KYCInfo')->length == 2) {
-            $data['client_name'] = $xml->getElementsByTagName('KYCValue')->item(0)->nodeValue . ' ' . $xml->getElementsByTagName('KYCValue')->item(1)->nodeValue;
+            $data['sender_first_name'] = $xml->getElementsByTagName('KYCValue')->item(0)->nodeValue;
+            $data['sender_last_name'] = $xml->getElementsByTagName('KYCValue')->item(1)->nodeValue;
         } elseif ($xml->getElementsByTagName('KYCInfo')->length == 3) {
-            $data['client_name'] = $xml->getElementsByTagName('KYCValue')->item(0)->nodeValue . ' ' . $xml->getElementsByTagName('KYCValue')->item(1)->nodeValue . ' ' . $xml->getElementsByTagName('KYCValue')->item(2)->nodeValue;
+            $data['sender_first_name'] = $xml->getElementsByTagName('KYCValue')->item(0)->nodeValue;
+            $data['sender_middle_name'] = $xml->getElementsByTagName('KYCValue')->item(1)->nodeValue;
+            $data['sender_last_name'] = $xml->getElementsByTagName('KYCValue')->item(2)->nodeValue;
         }
         $data['transaction_id'] = $xml->getElementsByTagName('TransID')->item(0)->nodeValue;
         $data['amount'] = $xml->getElementsByTagName('TransAmount')->item(0)->nodeValue;
         $data['acc_no'] = preg_replace('/\s+/', '', $xml->getElementsByTagName('BillRefNumber')->item(0)->nodeValue);
         $data['transaction_time'] = $xml->getElementsByTagName('TransTime')->item(0)->nodeValue;
-        $data['transaction_type'] = 1; // 1 indicates that this is an incoming/received transaction
+        $data['transaction_type'] = $xml->getElementsByTagName('TransType')->item(0)->nodeValue; // The type of the transaction eg. Paybill, Buygoods etc,
 
         /**
          * save this in the payments table, but we first check if it exists (Safaricom sometimes send the notification twice)
