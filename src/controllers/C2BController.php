@@ -3,9 +3,11 @@
 namespace Mobidev\Mpesa\controllers;
 
 //use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
+use Mobidev\Mpesa\models\MpesaBalance;
 use Mobidev\Mpesa\models\MpesaPaymentLog;
 use Mobidev\Mpesa\models\Payment;
 
@@ -63,12 +65,16 @@ class C2BController extends BaseController
         $data['transaction_time'] = $xml->getElementsByTagName('TransTime')->item(0)->nodeValue;
         $data['transaction_type'] = $xml->getElementsByTagName('TransType')->item(0)->nodeValue; // The type of the transaction eg. Paybill, Buygoods etc,
 
+        // update balance
+        self::updateMpesaBalance($xml->getElementsByTagName('OrgAccountBalance')->item(0)->nodeValue);
+
         /**
          * save this in the payments table, but we first check if it exists (Safaricom sometimes send the notification twice)
          */
         $transaction = Payment::whereTransactionId($data['transaction_id'])->first();
         if ($transaction === null) {
             $result = Payment::create($data);
+
 
             $payload = [
                 'payment' => $result
@@ -79,5 +85,20 @@ class C2BController extends BaseController
 
         }
 
+    }
+
+
+    protected function updateMpesaBalance($org_account_balance)
+    {
+        if (MpesaBalance::count() > 0) {
+            // update
+            $current_balance = MpesaBalance::where('id', '=', 1)->first();
+            $current_balance->mpesa_balance = $org_account_balance;
+            $current_balance->last_updated = Carbon::now();
+            $current_balance->save();
+        } else {
+            // first time
+            MpesaBalance::create(['mpesa_balance' => $org_account_balance]);
+        }
     }
 }
