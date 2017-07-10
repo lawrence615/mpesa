@@ -49,25 +49,53 @@ class C2BController extends BaseController
         $xml->loadXML($input);// for c2b
 
 
-        $data['phone_no'] = "+254" . substr(trim($xml->getElementsByTagName('MSISDN')->item(0)->nodeValue), -9);
-        if ($xml->getElementsByTagName('KYCInfo')->length == 2) {
-            $data['sender_first_name'] = $xml->getElementsByTagName('KYCValue')->item(0)->nodeValue;
-            $data['sender_last_name'] = $xml->getElementsByTagName('KYCValue')->item(1)->nodeValue;
-        } elseif ($xml->getElementsByTagName('KYCInfo')->length == 3) {
-            $data['sender_first_name'] = $xml->getElementsByTagName('KYCValue')->item(0)->nodeValue;
-            $data['sender_middle_name'] = $xml->getElementsByTagName('KYCValue')->item(1)->nodeValue;
-            $data['sender_last_name'] = $xml->getElementsByTagName('KYCValue')->item(2)->nodeValue;
-        }
+        // common data
+        $data['transaction_type'] = $xml->getElementsByTagName('TransType')->item(0)->nodeValue; // The type of the transaction eg. Paybill, Buygoods etc,
         $data['transaction_id'] = $xml->getElementsByTagName('TransID')->item(0)->nodeValue;
+        $data['transaction_time'] = $xml->getElementsByTagName('TransTime')->item(0)->nodeValue;
         $data['amount'] = $xml->getElementsByTagName('TransAmount')->item(0)->nodeValue;
         $data['business_number'] = $xml->getElementsByTagName('BusinessShortCode')->item(0)->nodeValue;
         $data['acc_no'] = preg_replace('/\s+/', '', $xml->getElementsByTagName('BillRefNumber')->item(0)->nodeValue);
-        $data['transaction_time'] = $xml->getElementsByTagName('TransTime')->item(0)->nodeValue;
-        $data['transaction_type'] = $xml->getElementsByTagName('TransType')->item(0)->nodeValue; // The type of the transaction eg. Paybill, Buygoods etc,
+
+
+        // check the transaction type and extract specific data
+        if ($xml->getElementsByTagName('TransType')->item(0)->nodeValue == 'Pay Bill') {
+            $data['phone_no'] = sprintf("254%d", substr(trim($xml->getElementsByTagName('MSISDN')->item(0)->nodeValue), -9));
+
+            if ($xml->getElementsByTagName('KYCInfo')->length == 2) {
+                $data['sender_first_name'] = $xml->getElementsByTagName('KYCValue')->item(0)->nodeValue;
+                $data['sender_last_name'] = $xml->getElementsByTagName('KYCValue')->item(1)->nodeValue;
+            } elseif ($xml->getElementsByTagName('KYCInfo')->length == 3) {
+                $data['sender_first_name'] = $xml->getElementsByTagName('KYCValue')->item(0)->nodeValue;
+                $data['sender_middle_name'] = $xml->getElementsByTagName('KYCValue')->item(1)->nodeValue;
+                $data['sender_last_name'] = $xml->getElementsByTagName('KYCValue')->item(2)->nodeValue;
+            }
+        } elseif ($xml->getElementsByTagName('TransType')->item(0)->nodeValue == 'Organization To Organization Transfer') {
+            if (isset($xml->getElementsByTagName('InvoiceNumber')->item(0)->nodeValue)) {
+                $invoiveNumber = explode(" ", $xml->getElementsByTagName('InvoiceNumber')->item(0)->nodeValue);
+                $data['phone_no'] = sprintf("254%d", substr(trim($invoiveNumber[0]), -9));
+                if (count($invoiveNumber) == 2) {
+                    $data['sender_first_name'] = $invoiveNumber[1];
+                    $data['sender_last_name'] = $invoiveNumber[2];
+                } elseif (count($invoiveNumber) == 3) {
+                    $data['sender_first_name'] = $invoiveNumber[1];
+                    $data['sender_middle_name'] = $invoiveNumber[2];
+                    $data['sender_last_name'] = $invoiveNumber[3];
+                }
+            }
+        }
+
 
         // update balance
         self::updateMpesaBalance($xml->getElementsByTagName('OrgAccountBalance')->item(0)->nodeValue);
 
+        // create payment
+        self::createPayment($data);
+
+    }
+
+    protected function createPayment($data)
+    {
         /**
          * save this in the payments table, but we first check if it exists (Safaricom sometimes send the notification twice)
          */
@@ -84,7 +112,6 @@ class C2BController extends BaseController
             $this->dispatcher->fire('c2b.received.payment', $payload);
 
         }
-
     }
 
 
