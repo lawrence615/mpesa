@@ -21,6 +21,7 @@ class Payment extends Model
         'acc_no',
         'transaction_type',
         'transaction_time',
+        'latest_org_balance',
         'is_matched'
     ];
 
