@@ -30,7 +30,7 @@ class MpesaServiceProvider extends ServiceProvider
 
         // publish config files
         $this->publishes([
-            __DIR__ . '/../../config/config.php' => config_path('mpesa.php'),
+            __DIR__ . '/../config/config.php' => config_path('mpesa.php'),
         ]);
 
     }
