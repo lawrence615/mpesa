@@ -106,10 +106,10 @@ class C2BController extends BaseController
             if (isset($xml->getElementsByTagName('InvoiceNumber')->item(0)->nodeValue)) {
                 $invoiveNumber = explode(" ", $xml->getElementsByTagName('InvoiceNumber')->item(0)->nodeValue);
                 $data['phone_no'] = sprintf("254%d", substr(trim($invoiveNumber[0]), -9));
-                if (count($invoiveNumber) == 2) {
+                if (count($invoiveNumber) == 3) {
                     $data['sender_first_name'] = $invoiveNumber[1];
                     $data['sender_last_name'] = $invoiveNumber[2];
-                } elseif (count($invoiveNumber) == 3) {
+                } elseif (count($invoiveNumber) == 4) {
                     $data['sender_first_name'] = $invoiveNumber[1];
                     $data['sender_middle_name'] = $invoiveNumber[2];
                     $data['sender_last_name'] = $invoiveNumber[3];
