@@ -38,12 +38,36 @@ class C2BController extends BaseController
             return;
         }
 
-        // package the data in an array with the type value for logging in mpesa_payment_logs_table table
-        $data = ['content' => $input, 'type' => 'c2b'];
+        // extract data from the content
+        $data = self::extractData($input);
 
-        // save
+
+        // create payment
+        self::createPayment($data);
+
+    }
+
+    /**
+     * We log the data as we receive it i.e. in soap payload
+     *
+     * @param $input
+     * @param $type
+     */
+    protected function logReceivedData($input, $type)
+    {
+        $data = ['content' => $input, 'type' => $type];
         MpesaPaymentLog::create($data);
+    }
 
+
+    /**
+     * We dive deep into the soap and extract the data needed to for the payments table
+     *
+     * @param $input
+     * @return mixed
+     */
+    protected function extractData($input)
+    {
         // initialize the DOMDocument  and create an object that we use to call loadXML and parse the XML
         $xml = new \DOMDocument();
         $xml->loadXML($input);// for c2b
@@ -56,10 +80,15 @@ class C2BController extends BaseController
         $data['amount'] = $xml->getElementsByTagName('TransAmount')->item(0)->nodeValue;
         $data['business_number'] = $xml->getElementsByTagName('BusinessShortCode')->item(0)->nodeValue;
         $data['acc_no'] = preg_replace('/\s+/', '', $xml->getElementsByTagName('BillRefNumber')->item(0)->nodeValue);
+        $data['latest_org_balance'] = $xml->getElementsByTagName('OrgAccountBalance')->item(0)->nodeValue;
 
 
         // check the transaction type and extract specific data
         if ($xml->getElementsByTagName('TransType')->item(0)->nodeValue == 'Pay Bill') {
+
+            // log
+            self::logReceivedData($input, 'c2b');
+
             $data['phone_no'] = sprintf("254%d", substr(trim($xml->getElementsByTagName('MSISDN')->item(0)->nodeValue), -9));
 
             if ($xml->getElementsByTagName('KYCInfo')->length == 2) {
@@ -71,6 +100,9 @@ class C2BController extends BaseController
                 $data['sender_last_name'] = $xml->getElementsByTagName('KYCValue')->item(2)->nodeValue;
             }
         } elseif ($xml->getElementsByTagName('TransType')->item(0)->nodeValue == 'Organization To Organization Transfer') {
+            // log
+            self::logReceivedData($input, 'b2b');
+
             if (isset($xml->getElementsByTagName('InvoiceNumber')->item(0)->nodeValue)) {
                 $invoiveNumber = explode(" ", $xml->getElementsByTagName('InvoiceNumber')->item(0)->nodeValue);
                 $data['phone_no'] = sprintf("254%d", substr(trim($invoiveNumber[0]), -9));
@@ -85,15 +117,14 @@ class C2BController extends BaseController
             }
         }
 
-
-        // update balance
-        self::updateMpesaBalance($xml->getElementsByTagName('OrgAccountBalance')->item(0)->nodeValue);
-
-        // create payment
-        self::createPayment($data);
-
+        return $data;
     }
 
+    /**
+     * Create the payment details and save in the payments table then fire an event with the data
+     *
+     * @param $data
+     */
     protected function createPayment($data)
     {
         /**
@@ -115,6 +146,9 @@ class C2BController extends BaseController
     }
 
 
+    /**
+     * @param $org_account_balance
+     */
     protected function updateMpesaBalance($org_account_balance)
     {
         if (MpesaBalance::count() > 0) {
